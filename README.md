@@ -1,253 +1,209 @@
-# AutoTestCase Generator
+# 🚀 AutoTestCase Generator
 
-QA tool yang menghasilkan daftar test case otomatis dari sebuah URL website. Crawl 1 halaman dengan Playwright, kirim ringkasan elemen ke DeepSeek, simpan ke Supabase, dan tampilkan tabel test case yang bisa di-export ke Excel.
+> **AI-Powered Automated QA Test Case Generator & Executable Suite Builder**
 
-## Tech stack
+AutoTestCase Generator adalah platform QA modern berbasis **Next.js 14, Playwright, DeepSeek LLM, dan Supabase**. Aplikasi ini secara otomatis melakukan *crawling* DOM pada web target, mengidentifikasi elemen interaktif (form, tombol, link, tabel, indikator CRUD), mengeksekusi alur tes otomatis (Auto-CRUD), dan menyusun daftar test case QA profesional siap pakai yang dapat di-export ke Excel secara instan.
 
-- **Next.js 14** (App Router) — frontend + API routes dalam satu project
-- **Playwright** — render & extract DOM (Node.js runtime API route)
-- **DeepSeek** (`deepseek-chat`) — generate test case dengan `response_format: json_object`
-- **Supabase** (Postgres) — simpan riwayat
-- **Tailwind CSS** — styling
-- **exceljs** — export `.xlsx`
+---
 
-## Quick start (lokal)
+## 📌 GitHub Repository Description & Topics
+
+Gunakan informasi ini saat mengisi bagian **About** pada halaman repository GitHub:
+
+* **Short Description / Tagline**:
+  > ⚡ AI-powered QA tool that automatically crawls web pages with Playwright, executes Auto-CRUD workflows, and generates comprehensive manual test cases using DeepSeek LLM. Includes Executive Excel Export & Supabase history tracking.
+
+* **Topics / Tags**:
+  `nextjs14` `playwright` `deepseek-ai` `qa-automation` `testcase-generator` `typescript` `supabase` `exceljs` `software-testing` `web-crawler`
+
+---
+
+## ✨ Fitur Utama
+
+- 🔍 **Automated DOM Web Crawler**: Mengidentifikasi form, input, button, link navigasi, headings, dan tabel data secara presisi dengan Playwright.
+- 🧠 **AI Test Generation (DeepSeek LLM)**: Menghasilkan 15–40 test case QA terstruktur (Functional, Validation, UI, & Negative Testing) dalam Bahasa Indonesia 🇮🇩 atau English 🇬🇧.
+- ⚡ **Auto-CRUD Execution Engine**: Menjalankan siklus otomatis *Create → Read → Update → Delete* secara *live* pada website target sebagai *ground truth* verifikasi.
+- 🔐 **Authenticated Dashboard Crawling**: Mendukung *login flow* otomatis & selector kustom untuk meng-crawl halaman internal/dashboard di balik tembok otentikasi.
+- 🌐 **Multi-Page Crawling Mode**: Melakukan crawling hingga 10 halaman *same-origin* dalam satu sesi test suite.
+- 📊 **Executive Excel Export (`.xlsx`)**: Menghasilkan file Excel berdesain *executive-grade* lengkap dengan KPI summary badges, zebra striping, dan frozen header.
+- 🌐 **Live Translation (ID ↔ EN)**: Mengubah bahasa seluruh test case hanya dengan 1-klik tanpa kehilangan metadata ID atau kategori.
+- 🔍 **Playwright Trace & Failure Diagnostics**: Otomatis merekam *timeline trace zip*, screenshot failure, dan menyimpan *raw LLM response* untuk kemudahan debugging.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router, Server Actions & API Routes)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Browser Automation**: [Playwright](https://playwright.dev/) (Chromium)
+- **AI Model**: [DeepSeek Chat API](https://platform.deepseek.com/) (`deepseek-chat`)
+- **Database**: [Supabase](https://supabase.com/) (PostgreSQL & Row Level Security)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Reporting**: [ExcelJS](https://github.com/exceljs/exceljs)
+
+---
+
+## 📐 Alur Kerja Sistem
+
+```
+ ┌────────────────┐     ┌──────────────────────┐     ┌────────────────────────┐
+ │   User Input   │ ──> │ Playwright Engine    │ ──> │   Element Scraper      │
+ │  (URL / Auth)  │     │ (Headless Chromium)  │     │ (Forms, Buttons, Nav)  │
+ └────────────────┘     └──────────────────────┘     └────────────────────────┘
+                                                                 │
+ ┌────────────────┐     ┌──────────────────────┐                 │
+ │ Executive Excel│ <── │ DeepSeek LLM API     │ <───────────────┘
+ │ & Supabase DB  │     │ (JSON Test Cases)    │
+ └────────────────┘     └──────────────────────┘
+```
+
+---
+
+## 🚀 Quick Start (Lokal)
+
+### 1. Prasyarat
+- Node.js `v18.x` atau `v20.x` / `v22.x`
+- NPM / PNPM / YARN
+
+### 2. Instalasi & Setup
 
 ```bash
-# 1. Install deps + Chromium
+# Clone repository
+git clone https://github.com/ramadhanirizky22/autotestcase-generator.git
+cd autotestcase-generator
+
+# Install dependencies (+ Playwright Chromium)
 npm install
 
-# 2. Salin env, lalu isi DEEPSEEK_API_KEY + Supabase keys
+# Salin contoh environment
 cp .env.example .env.local
+```
 
-# 3. Jalankan
+### 3. Konfigurasi Environment (`.env.local`)
+
+Isi file `.env.local` dengan kredensial API kamu:
+
+```env
+# DeepSeek API
+DEEPSEEK_API_KEY=sk-your-deepseek-api-key
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-chat
+
+# Supabase Storage
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+
+# Crawler Tuning (Opsional)
+CRAWLER_TIMEOUT_MS=20000
+CRAWLER_HEADLESS=true
+CRAWLER_SLOWMO_MS=0
+CRAWLER_TRACE=true
+```
+
+### 4. Setup Database Supabase
+
+1. Buat proyek baru di [Supabase Dashboard](https://supabase.com).
+2. Buka **SQL Editor** → Tempel isi dari file [`supabase/schema.sql`](./supabase/schema.sql) → Klik **Run**.
+3. Ambil `Project URL` dan `service_role key` dari menu **Settings → API**.
+
+### 5. Jalankan Server Dev
+
+```bash
 npm run dev
 ```
 
-Buka http://localhost:3000.
+Buka [http://localhost:3000](http://localhost:3000) di browser kamu.
 
-> Catatan: `npm install` akan otomatis menjalankan `playwright install chromium`. Kalau gagal, jalankan manual: `npx playwright install chromium`.
+---
 
-## Setup Supabase
+## ⚙️ Environment Variables Reference
 
-1. Buat project baru di https://supabase.com.
-2. Di dashboard, buka **SQL Editor** → tempel isi [`supabase/schema.sql`](./supabase/schema.sql) → Run.
-3. Buka **Project Settings → API**, copy:
-   - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
-   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (rahasia, server-only)
+| Variable | Type | Default | Deskripsi |
+|---|---|---|---|
+| `DEEPSEEK_API_KEY` | String | - | **Wajib**. API Key dari DeepSeek Platform |
+| `DEEPSEEK_BASE_URL` | String | `https://api.deepseek.com` | Base URL endpoint DeepSeek API |
+| `DEEPSEEK_MODEL` | String | `deepseek-chat` | Model DeepSeek yang digunakan |
+| `NEXT_PUBLIC_SUPABASE_URL` | String | - | **Wajib**. URL Proyek Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | String | - | **Wajib**. Secret Service Role Key Supabase |
+| `CRAWLER_TIMEOUT_MS` | Number | `20000` | Maksimal waktu tunggu Playwright (ms) |
+| `CRAWLER_HEADLESS` | Boolean | `true` | `false` untuk melihat window Chromium asli secara live |
+| `CRAWLER_SLOWMO_MS` | Number | `0` | Jeda waktu per aksi klik/fill (ms) saat debugging |
+| `CRAWLER_TRACE` | Boolean | `true` | Merekam trace.zip Playwright per eksekusi |
 
-Server menggunakan service-role key. Tabel di-set `RLS enabled` tanpa policy publik, jadi hanya bisa diakses dari server.
+---
 
-## Setup DeepSeek
+## 📊 Format Output Test Case
 
-1. Buat API key di https://platform.deepseek.com.
-2. Set `DEEPSEEK_API_KEY` di `.env.local`.
+Setiap test case di-generate dengan struktur JSON standar QA:
 
-## Struktur project
-
-```
-app/
-  api/
-    generate/route.ts   # crawl + DeepSeek + simpan ke Supabase
-    export/route.ts     # build Excel
-  history/
-    page.tsx            # daftar riwayat
-    [id]/page.tsx       # detail run
-  layout.tsx
-  page.tsx              # form generate
-components/
-  GenerateForm.tsx
-  TestCaseTable.tsx
-  ElementSummary.tsx
-lib/
-  crawler.ts            # Playwright extractor
-  deepseek.ts           # DeepSeek client + JSON parsing
-  excel.ts              # exceljs builder
-  supabase.ts           # server-side Supabase client + types
-supabase/schema.sql
-```
-
-## Format test case
-
-Setiap test case berbentuk:
-
-```jsonc
+```json
 {
   "test_id": "TC-001",
-  "test_case_name": "...",
-  "precondition": "...",
-  "test_steps": ["1. ...", "2. ..."],
-  "expected_result": "...",
-  "priority": "High" | "Medium" | "Low",
-  "category": "Functional" | "Validation" | "UI" | "Negative Test"
+  "test_case_name": "Verifikasi Login dengan Kredensial Valid",
+  "precondition": "Pengguna berada di halaman login dan memiliki akun aktif",
+  "test_steps": [
+    "1. Buka halaman https://example.com/login",
+    "2. Masukkan email valid pada input Email",
+    "3. Masukkan password valid pada input Password",
+    "4. Klik tombol 'Sign In'"
+  ],
+  "expected_result": "Pengguna berhasil masuk dan diarahkan ke Dashboard",
+  "actual_result": "",
+  "priority": "High",
+  "category": "Functional"
 }
 ```
 
-DeepSeek dipanggil dengan `response_format: { type: "json_object" }`. Parser memvalidasi field dan jatuh ke default jika model menyimpang dari skema.
+---
 
-## Penanganan error
+## 🎥 Monitoring & Debugging Playwright Live
 
-API route mengembalikan kode error spesifik:
+Kamu bisa melihat cara kerja crawler secara langsung dengan mengaktifkan mode berikut di `.env.local`:
 
-| Kode | Arti |
-|---|---|
-| `INVALID_URL` | URL bukan http/https valid |
-| `TIMEOUT` | Halaman tidak selesai loading |
-| `AUTH_REQUIRED` | Halaman terlihat butuh login (aktifkan opsi "Login dulu") |
-| `LOGIN_FORM_NOT_FOUND` | Tidak ketemu field username/password di halaman login (pakai selector kustom) |
-| `LOGIN_FAILED` | Submit login tidak meredirect ke halaman terotentikasi (cek kredensial) |
-| `EMPTY_PAGE` | Tidak ada elemen interaktif |
-| `MISSING_KEY` | `DEEPSEEK_API_KEY` belum di-set |
-| `API_ERROR` | DeepSeek mengembalikan non-2xx |
-| `PARSE_ERROR` | Respons DeepSeek bukan JSON valid |
-
-Frontend menampilkan pesan dari field `error` di response.
-
-## Mode Login (test halaman dashboard)
-
-Aktifkan checkbox **Login dulu sebelum crawl**, lalu isi:
-
-- **URL halaman target** — URL dashboard / halaman setelah login (contoh `https://app.example.com/dashboard`).
-- **URL halaman login** — contoh `https://app.example.com/login`.
-- **Username/Email** dan **Password** — dipakai sekali untuk session Playwright.
-
-Crawler akan:
-1. Navigate ke login URL
-2. Auto-detect field username (priority: `input[type=email]`, lalu nama umum: `email`/`user`/`login`) dan password (`input[type=password]`)
-3. Submit form (klik tombol submit, atau press Enter di field password)
-4. Verifikasi login: URL berubah dan field password hilang
-5. Navigate ke URL dashboard, extract element, generate test case
-
-Kalau site punya form login non-standar (modal, custom component, multi-step), pakai **Selector kustom** untuk override:
-
-| Field | Contoh selector |
-|---|---|
-| Username | `#email`, `input[name="user_email"]`, `[data-testid="email-input"]` |
-| Password | `#password`, `input[data-test="pwd"]` |
-| Submit button | `button[type="submit"]`, `button:has-text("Sign in")` |
-
-Saat mode login aktif, prompt DeepSeek otomatis menambahkan test case spesifik post-login: logout flow, session timeout, akses URL tanpa login (harus redirect), CRUD entry points di dashboard, dst.
-
-### Keamanan kredensial
-
-- Kredensial **tidak pernah** disimpan ke Supabase. Hanya `loginUrl` yang dicatat di `element_summary.login_url`.
-- Kredensial dikirim dari browser ke API route (HTTPS-only di production) lalu diteruskan ke Playwright dalam memory.
-- Tetap pakai akun **test/staging** milik kamu sendiri. Jangan input akun produksi orang lain.
-
-## Auto-CRUD (eksperimental)
-
-Aktifkan toggle **Auto-execute CRUD (eksperimental)** di form untuk menjalankan siklus CRUD penuh secara otomatis pada halaman target:
-
-1. **Create** — cari tombol Create/Add/Tambah, isi form dengan data dummy (`Auto Test <id>`), klik Save, verifikasi baris baru muncul
-2. **Read** — klik View/Detail di baris yang baru dibuat, pastikan modal/halaman detail terbuka
-3. **Update** — klik Edit di baris itu, ubah field pertama jadi `... (edited)`, simpan, verifikasi
-4. **Delete** — klik Delete di baris itu, klik tombol konfirmasi, verifikasi baris hilang (sekaligus cleanup)
-
-Hasilnya ditampilkan sebagai **execution log** di hasil + di history detail, dengan status per step (✓/✗/−), durasi, dan path screenshot. Test case yang di-generate DeepSeek akan reference hasil eksekusi sebagai ground truth.
-
-### Pengaman
-
-- Hanya Update/Delete pada **baris yang dibuat oleh test ini** (matched by unique identifier) — data existing tidak disentuh
-- Read pakai baris mana saja (non-destructive)
-- Total budget ~45 detik. Total request bisa sampai 90 detik dengan login + DeepSeek
-- Wajib tick checkbox konfirmasi sebelum Generate
-
-### ⚠️ Risiko
-
-- **Membuat data nyata** di target site. Cuma boleh di staging/test milik kamu sendiri.
-- Kalau Delete gagal (mis. tombol confirm tidak ditemukan), ada sampah row yang harus dihapus manual.
-- Form yang butuh data realistik (KTP valid, email yang belum dipakai, dropdown wajib, file upload) bisa fail validasi.
-
-## Watch the test flow live
-
-Tiga cara untuk lihat alur test secara visual, kontrol via env var di `.env.local`:
-
-### 1. Headed mode — buka browser asli
-
+### 1. Headed Mode (Buka Browser Asli)
 ```bash
 CRAWLER_HEADLESS=false
 ```
 
-Restart dev server (`Ctrl+C`, `npm run dev`), lalu Generate. Sebuah window Chromium akan terbuka dan kamu bisa nonton Playwright klik/ketik secara real-time.
-
-### 2. Slow motion — kasih jeda antar action
-
+### 2. Slow Motion (Visualisasi Langkah)
 ```bash
 CRAWLER_HEADLESS=false
 CRAWLER_SLOWMO_MS=400
 ```
 
-Setiap action Playwright (click/fill/press) akan dijeda 400ms. Cocok untuk MENGIKUTI mata terutama saat auto-CRUD jalan cepat.
-
-### 3. Playwright Trace — replay setelah selesai
-
+### 3. Replay dengan Playwright Trace Viewer
 ```bash
-CRAWLER_TRACE=true
+# Jalankan trace viewer dari path file yang dihasilkan di UI
+npx playwright show-trace /path/to/trace.zip
 ```
 
-Setiap run akan menghasilkan `trace.zip` yang merekam timeline lengkap: screenshot per step, DOM snapshot, network log, console output, sumber action. Path file ditampilkan di hasil UI:
+---
 
-```bash
-npx playwright show-trace /var/folders/.../autotc-trace-1234567890.zip
-```
+## 📁 Folder Diagnostic `failed-runs/`
 
-Trace Viewer adalah **cara paling powerful** untuk debug — kamu bisa scrub timeline, lihat persis apa yang Playwright klik di tiap moment, dan inspect DOM seperti DevTools. Bisa juga di-share ke teman.
+Apabila terjadi kesalahan saat crawling atau parsing LLM, sistem secara otomatis mengisolasi log ke dalam folder `failed-runs/<timestamp>-<id>/`:
 
-Kombinasi rekomendasi: `CRAWLER_HEADLESS=true + CRAWLER_TRACE=true` di production-ish, `CRAWLER_HEADLESS=false + CRAWLER_SLOWMO_MS=400` saat debug aktif.
+- `info.json`: Metadata request & error code.
+- `error.log`: Full stack trace error.
+- `deepseek_response.txt`: Raw response dari LLM jika terjadi masalah parsing JSON.
+- `screenshot.png`: Cuplikan tampilan halaman saat terjadi failure.
+- `trace.zip`: Playwright trace timeline.
 
-## Folder failed-runs
+---
 
-Setiap kali generate gagal, detail-nya otomatis disimpan ke `failed-runs/<timestamp>-<id>/` di root project. Folder ini berisi:
+## 📦 Pilihan Deployment
 
-| File | Isi |
-|---|---|
-| `info.json` | Request metadata (URL, used_login, auto_crud, login selector kustom kalau ada — **tanpa kredensial**) + error code/message + durasi |
-| `error.log` | Pesan error lengkap + stack trace |
-| `screenshot.png` | Screenshot pas error terjadi (bila crawler sempat ngambil) |
-| `trace.zip` | Playwright trace (kalau `CRAWLER_TRACE=true`) — replay dengan `npx playwright show-trace` |
+- **Vercel + Railway / Render (Recommended)**: Deploy frontend di Vercel, dan pisahkan API crawler `/api/generate` ke Railway/Render menggunakan Docker image official Playwright (`mcr.microsoft.com/playwright:v1.48.0-jammy`).
+- **Self-Hosted Docker**: Build Next.js standalone menggunakan Dockerfile Chromium.
 
-Path folder ditampilkan di kotak error UI. Folder ini di-`.gitignore` jadi nggak ke-commit.
+---
 
-Override lokasi via env var:
-```bash
-FAILED_RUNS_DIR=/some/other/path
-```
+## 📄 Lisensi
 
-Catatan: kredensial **tidak pernah** disimpan ke `info.json` — hanya flag `used_login` + `login_url` (URL halaman login, bukan password).
+Project ini dilisensikan di bawah [MIT License](LICENSE).
 
-## Catatan deployment (PENTING)
+---
 
-Playwright butuh Chromium binary. Ini **tidak jalan apa adanya** di Vercel default function (size limit + binary tidak tersedia). Pilihan arsitektur:
-
-### Opsi A — Hybrid (rekomendasi)
-
-- Frontend + halaman + `/api/export` di **Vercel**.
-- API crawler `/api/generate` dipisah ke **Railway / Render / Fly.io** sebagai service Node.js (dengan Playwright + Chromium pre-installed pakai image `mcr.microsoft.com/playwright:v1.48.0-jammy`).
-- Set env `NEXT_PUBLIC_GENERATE_URL` dan ubah `fetch("/api/generate")` di `GenerateForm` menjadi URL service tersebut. (Tidak dilakukan default agar lokal tetap simple.)
-
-### Opsi B — Semua di Vercel dengan `@sparticuz/chromium`
-
-- Tambah dependency: `npm i @sparticuz/chromium playwright-core`.
-- Ganti import di `lib/crawler.ts`:
-  ```ts
-  import chromium from "@sparticuz/chromium";
-  import { chromium as playwright } from "playwright-core";
-  // browser = await playwright.launch({
-  //   args: chromium.args,
-  //   executablePath: await chromium.executablePath(),
-  //   headless: true,
-  // });
-  ```
-- Set `maxDuration` route ke 60 (sudah default). Pastikan plan Vercel mendukung function size yang dibutuhkan (`@sparticuz/chromium` ~50MB, butuh Pro plan untuk 250MB function).
-
-### Opsi C — Self-host (Docker)
-
-Image dasar `mcr.microsoft.com/playwright:v1.48.0-jammy` sudah punya Chromium. Build Next.js standalone dan run via `node server.js`.
-
-Dipilih default untuk pengembangan lokal: **Playwright biasa (Opsi C / lokal)**, tanpa adapter serverless. Saat akan deploy, putuskan opsi di atas sebelum menulis kode lain — adapter yang dipilih mempengaruhi `lib/crawler.ts`.
-
-## Batasan scope (MVP)
-
-- Hanya 1 halaman per request, bukan multi-page crawl.
-- Tidak ada autentikasi user untuk tool ini sendiri; semua history publik untuk siapa pun yang punya service-role key.
-- Login flow ke target site mendukung form login standar (1 step, field email/password). Site dengan CAPTCHA, 2FA, OAuth/SSO popup, atau wizard multi-step belum didukung.
+<p align="center">
+  Crafted with ❤️ by <a href="https://github.com/ramadhanirizky22">Ramadhani Rizky</a>
+</p>
